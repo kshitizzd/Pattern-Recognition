@@ -6,7 +6,6 @@ from torch.utils.data import DataLoader
 
 class LinearClassifier(nn.Module):
     """Simple linear classifier: y = Wx + b"""
-
     def __init__(self, input_dim=784, num_classes=10):
         super(LinearClassifier, self).__init__()
         self.linear = nn.Linear(input_dim, num_classes)
@@ -30,7 +29,11 @@ def train_linear_classifier(X_train, y_train, X_test, y_test, epochs=20, lr=0.01
 
     # Initialize model
     model = LinearClassifier()
+    
+    # Use CrossEntropyLoss for classification
     criterion = nn.CrossEntropyLoss()
+    
+    # Use SGD optimizer with autograd
     optimizer = optim.SGD(model.parameters(), lr=lr)
 
     # Track training history
@@ -45,11 +48,21 @@ def train_linear_classifier(X_train, y_train, X_test, y_test, epochs=20, lr=0.01
         total = 0
 
         for batch_X, batch_y in train_loader:
+            # Zero gradients 
             optimizer.zero_grad()
+            
+            # Forward pass through nn.Linear
             outputs = model(batch_X)
+            
+            # Compute loss using autograd
             loss = criterion(outputs, batch_y)
+            
+            # Backward pass using autograd
             loss.backward()
+            
+            # Update parameters using optimizer
             optimizer.step()
+            
             total_loss += loss.item()
             
             # Calculate training accuracy
@@ -73,5 +86,3 @@ def train_linear_classifier(X_train, y_train, X_test, y_test, epochs=20, lr=0.01
         print(f"Epoch {epoch+1}/{epochs}, Loss: {avg_loss:.4f}, Train Acc: {train_acc:.4f}, Test Acc: {accuracy:.4f}")
 
     return model, accuracy.item(), train_losses, train_accuracies
-
-
